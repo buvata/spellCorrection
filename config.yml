@@ -1,0 +1,26 @@
+data: ../preprocess/data/new_data_train/new_spell
+save_model: save_model/model
+save_checkpoint_steps: 2
+keep_checkpoint: 2
+train_steps: 10
+valid_steps: 5
+report_every: 5
+
+encoder_type: transformer
+decoder_type: transformer
+layers: 6
+heads: 8
+rnn_size: 512
+transformer_ff: 512
+#src_word_vec_size: 512
+#tgt_word_vec_size: 512
+word_vec_size: 512
+rnn_type: LSTM
+
+
+optim: adam
+learning_rate: 0.001
+batch_size: 2
+dropout: 0.0
+
+log_file: save_model/log_file.txt
