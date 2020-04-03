@@ -1,7 +1,7 @@
 from queue import Queue
 import threading
-from aug_dataset_v2 import *
-from handle_text import *
+from spellCorrection.preprocess.aug_dataset_v2 import *
+from spellCorrection.preprocess.handle_text import *
 from tqdm import tqdm
 
 exitFlag = 0

@@ -3,7 +3,7 @@ from flask import Flask
 from flask import request, jsonify
 from flask_restful import Api
 import os
-from handle_text import *
+from spellCorrection.preprocess.handle_text import *
 from urllib.parse import unquote
 
 

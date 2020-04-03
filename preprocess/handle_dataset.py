@@ -1,6 +1,6 @@
 import re
 import string
-from spellCorection.preprocess.aug_dataset_v2 import *
+from spellCorrection.preprocess.aug_dataset_v2 import *
 
 vocabs_1 = []
 with open("vocab/all-vietnamese-syllables.txt", 'r') as rf:

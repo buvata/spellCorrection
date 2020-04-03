@@ -2,8 +2,7 @@ import re
 import unidecode
 import unicodedata
 import string
-from spellCorection.preprocess.aug_dataset_v2 import *
-
+import json
 
 set_punctuations = set(string.punctuation)
 list_punctuations_out = ['”', '”', "›", "“", '"']
@@ -213,6 +212,98 @@ def split_word_with_bound(text):
     return ls
 
 
+vocabs_vn_accent = []
+with open("vocab/all-vietnamese-syllables.txt", 'r') as rf:
+    for line in rf.readlines():
+        line = line.strip()
+        line = norm_text(line)
+        # line = remove_accent(line)
+        vocabs_vn_accent.append(line)
+
+vocabs_vn_non_accent = []
+with open("vocab/vn_remove_accent.txt", 'r') as rf:
+    for line in rf.readlines():
+        line = line.strip()
+        line = norm_text(line)
+        # line = remove_accent(line)
+        vocabs_vn_non_accent.append(line)
+
+vocabs = set(vocabs_vn_accent + vocabs_vn_non_accent)
+
+
+keys_break_typing = []
+values_break_typing = []
+with open("vocab/vn-break-typing.txt", 'r') as rf:
+    for line in rf.readlines():
+        line = line.strip()
+        line = norm_text(line)
+        line = line.split(' ')
+        keys_break_typing.append(line[0])
+        values_break_typing.append(line[1])
+
+
+vocabs_telex = {}
+keys_wrong_telex = []
+values_wrong_telex = []
+with open("vocab/all-vietnamese-words-wrong-telex.txt", 'r') as rf:
+    for line in rf.readlines():
+        line = line.strip()
+        line = norm_text(line)
+        line = line.split(' ')
+        keys_wrong_telex.append(line[0])
+        values_wrong_telex.append(line[1])
+
+    for k, v in enumerate(keys_wrong_telex):
+        try:
+            vocabs_telex[v].append(values_wrong_telex[k])
+        except KeyError:
+            vocabs_telex[v] = [values_wrong_telex[k]]
+
+
+with open("vocab/keys_random.json", 'r') as rf:
+    data_keys_random = json.load(rf)
+ls_key_random = list(data_keys_random.keys())
+
+
+with open("vocab/keys_last.json", 'r') as rf:
+    data_keys_last = json.load(rf)
+ls_keys_last = list(data_keys_last.keys())
+
+
+def check_syll_vn(txt):
+    if remove_accent(txt) != txt:
+        if norm_text(txt) in vocabs_vn_accent:
+            return True
+        else:
+            return False
+    else:
+        if txt in vocabs_vn_non_accent:
+            return True
+        else:
+            return False
+
+
+def check_word_oov(txt_src, txt_des):
+    texts = split_word_with_bound(txt_src)
+    ls_txt_des = split_word_with_bound(txt_des)
+
+    for i, txt in enumerate(texts):
+        if not check_syll_vn(txt) and check_list_punct(txt) and not txt.isnumeric():
+            texts[i] = split_word(texts[i])
+            ls_txt_des[i] = split_word(ls_txt_des[i])
+
+        if txt.isnumeric():
+            texts[i] = split_numeric(txt)
+            ls_txt_des[i] = split_numeric(ls_txt_des[i])
+
+        if not check_all_punct(txt) and not txt.isalnum():
+            texts[i] = split_numeric(txt)
+            ls_txt_des[i] = split_numeric(ls_txt_des[i])
+
+
+    return ' '.join(texts), ' '.join(ls_txt_des)
+
+
 def format_output(text):
     text = norm_text(text)
     # text = link_punc(text)
@@ -255,6 +346,6 @@ def format_input(text):
 
 
 if __name__ == '__main__':
-    # s = 'hôm nay toif di rất vui, gặp 37 bạn mới nhiễm covid-19 cách ly.'
-    # print(format_input(s))
-    app.run(host="127.0.0.1", port="8000", debug=True)
+    s = 'hôm nay toif di rất vui, gặp 37 bạn mới nhiễm covid-19 cách ly.'
+    print(format_input(s))
+
