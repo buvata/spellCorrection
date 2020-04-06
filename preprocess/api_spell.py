@@ -21,10 +21,10 @@ opt = Namespace(alpha=0.0, attn_debug=False, avg_raw_probs=False, batch_size=1, 
                 block_ngram_repeat=0, config=None, coverage_penalty='none', data_type='text', dump_beam='',
                 dynamic_dict=False, fp32=False, gpu=-1, ignore_when_blocking=[], image_channel_size=3,
                 length_penalty='none', log_file='', log_file_level='0', max_length=350, max_sent_length=350,
-                min_length=0, models=['/home/taibv/Documents/Projects/spellCorection/train/save_model/model_step_10.pt'],
+                min_length=0, models=['/home/taibv/Documents/Projects/spellCorrection/train/save_model/model_step_10.pt'],
                 n_best=1, output='pred.txt', phrase_table='', random_sampling_temp=1.0, random_sampling_topk=1, ratio=-0.0,
                 replace_unk=True, report_bleu=False, report_rouge=False, report_time=False, sample_rate=16000,
-                save_config=None, seed=829, shard_size=10000, share_vocab=False, src='/home/taibv/Documents/Projects/spellCorection/vocab/test_input.tmp',
+                save_config=None, seed=829, shard_size=10000, share_vocab=False,
                 src_dir='', stepwise_penalty=False, tgt=None, verbose=True)
 
 translator = build_translator(opt)
