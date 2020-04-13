@@ -139,12 +139,116 @@ Tỉ lệ số câu lỗi sinh ra phụ thuộc vào chiều dài:
      
 
 
-**Version 3**
+**Version 3,4**
 
 Thêm các lỗi:
 
     Thêm từ bất kì vào câu
     Biến đổi từ và làm từ đó sai
+    
+Tỉ lệ số câu lỗi sinh ra phụ thuộc vào chiều dài:
+
+    if prob < 0.7:
+        if len(text_src) > 25:
+            n_augment_sent = random.choice([2, 3])
+        elif 15 < len(split_word_with_bound(text_src)) <= 25:
+            n_augment_sent = random.choice([1, 2])
+
+
++ 20%:
+
+    lỗi một từ 15%:
+        
+        change_type_telex: 0.2
+        random_change_word_and_break:0.05
+        convert_typing_missing_char: 0.15
+        convert_random_word_distance_keyboard: 0.15
+        convert_last_char_distance_keyboard: 0.15
+        random_swap_char_in_word: 0.1
+        convert_first_char_distance_keyboard: 0.1
+        add_char_in_last_word: 0.1
+     
+     random_add_word: 0.1
+        
++ 15%:
+
+    remove_split_word : 0.3 
+    
+    lỗi 1 từ : 0.1
+    
+        random_remove_accent:0.1
+        random_change_word_and_break:0.1
+        change_type_telex: 0.15
+        convert_typing_missing_char: 0.1
+        convert_random_word_distance_keyboard: 0.1
+        convert_last_char_distance_keyboard: 0.1
+        random_swap_char_in_word: 0.1
+        convert_first_char_distance_keyboard: 0.15
+        add_char_in_last_word: 0.1
+    
+     random_del_word: 0.3 
+     
++ 15%: 
+    
+    lỗi 1 từ: 0.1
+    
+        random_remove_accent:0.1
+        random_change_word_and_break: 0.1
+        change_type_telex: 0.15
+        convert_typing_missing_char: 0.1
+        convert_random_word_distance_keyboard: 0.1
+        random_change_word_and_break: 0.1
+        convert_last_char_distance_keyboard: 0.1
+        convert_first_char_distance_keyboard: 0.15
+        add_char_in_last_word: 0.1
+        
+    change_accent: 0.3
+    
+    change_first_char: 0.3
+    
++ 10%:
+
+        0.2 :
+            remove_split_word
+            change_accent
+
+        0.2 :
+            change_first_char
+            random_del_word
+
+        0.2 :
+            change_accent
+            random_del_word
+
+        0.15:
+            remove_split_word
+            change_first_char
+         
+         0.1: 
+            random_add_word
+             
++ 10%:
+
+    remove_split_word : 0.2
+    
+    lỗi 1 từ : 0.1
+    
+        random_remove_accent:0.1
+        random_change_word_and_break: 0.1
+        change_type_telex: 0.15
+        convert_typing_missing_char: 0.1
+        convert_random_word_distance_keyboard: 0.1
+        random_swap_char_in_word: 0.1
+        convert_last_char_distance_keyboard: 0.1
+        convert_first_char_distance_keyboard: 0.1
+        add_char_in_last_word: 0.15
+    
+     change_first_char: 0.3
+     
+     change_accent: 0.3
+     
+     random_del_word: 0.4
+     
     
  
      

@@ -380,31 +380,29 @@ def add_char_in_word(txt_src, txt_des, index, thresh_hold=0.6):
     prob = random.random()
     if prob < thresh_hold:
         if check_syll_vn(texts[i]):
-            if remove_accent(texts[i]) != texts[i]:
-                prob = random.random()
-                if prob < 0.7:
-                    if texts[i] in list(vocabs_telex.keys()):
-                        ls_wr_txt = vocabs_telex[texts[i]]
-                        texts[i] = split_word(random.choice(ls_wr_txt) + remove_accent(texts[i][-1]))
-                        ls_txt_des[i] = split_word(ls_txt_des[i])
-
-                else:
-                    texts[i] = split_word(texts[i] + texts[i][-1])
+            prob = random.random()
+            if prob < 0.7:
+                if texts[i] in list(vocabs_telex.keys()):
+                    ls_wr_txt = vocabs_telex[texts[i]]
+                    texts[i] = split_word(random.choice(ls_wr_txt) + remove_accent(texts[i][-1]))
                     ls_txt_des[i] = split_word(ls_txt_des[i])
+
+            else:
+                texts[i] = split_word(texts[i] + texts[i][-1])
+                ls_txt_des[i] = split_word(ls_txt_des[i])
 
     else:
         if check_syll_vn(texts[i]):
-            if remove_accent(texts[i]) != texts[i]:
-                prob = random.random()
-                if prob < 0.6:
-                    if texts[i] in list(vocabs_telex.keys()):
-                        ls_wr_txt = vocabs_telex[texts[i]]
-                        texts[i] = split_word(remove_accent(texts[i][0]) + random.choice(ls_wr_txt))
-                        ls_txt_des[i] = split_word(ls_txt_des[i])
-                else:
-                    # không vỡ telex : hôm -> hhôm
-                    texts[i] = split_word(remove_accent(texts[i][0]) + texts[i])
+            prob = random.random()
+            if prob < 0.7:
+                if texts[i] in list(vocabs_telex.keys()):
+                    ls_wr_txt = vocabs_telex[texts[i]]
+                    texts[i] = split_word(remove_accent(texts[i][0]) + random.choice(ls_wr_txt))
                     ls_txt_des[i] = split_word(ls_txt_des[i])
+            else:
+                # không vỡ telex : hôm -> hhôm
+                texts[i] = split_word(remove_accent(texts[i][0]) + texts[i])
+                ls_txt_des[i] = split_word(ls_txt_des[i])
 
 
     return ' '.join(texts), ' '.join(ls_txt_des)
@@ -508,7 +506,7 @@ def convert_last_char_distance_keyboard(txt_src, txt_des, index, thresh_hold=1):
             texts[i] = texts[i][:-1] + data_keys_last[texts[i][-1]][0]
             if not check_syll_vn(texts[i]):
                 prob = random.random()
-                if prob < 0.7:
+                if prob < 0.8:
                     for k, v in enumerate(keys_break_typing):
                         if v in texts[i]:
                             texts[i] = texts[i].replace(v, values_break_typing[k])
