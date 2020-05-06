@@ -21,18 +21,19 @@ def random_remove_accent(text_src, text_des, index, thresh_hold=1):
     return ' '.join(texts), text_des
 
 
-lst = [['à', 'á', 'ạ'],
-            ['ă', 'ằ', 'ắ', 'ặ'],
-            ['â', 'ầ', 'ấ', 'ậ'],
-            ['e', 'è', 'é', 'ẹ'],
-            ['ê', 'ề', 'ế', 'ệ'],
-            ['ò', 'ó', 'ọ'],
-            ['ô', 'ồ', 'ố', 'ộ'],
+lst = [['ã', 'à', 'á', 'ạ'],
+            ['ẵ', 'ă', 'ằ', 'ắ', 'ặ'],
+            ['â', 'ẫ', 'ầ', 'ấ', 'ậ'],
+            ['e', 'è', 'é', 'ẹ', 'ẽ'],
+            ['ê', 'ề', 'ế', 'ệ', 'ễ'],
+            ['ò', 'ó', 'ọ', 'õ'],
+            ['ô', 'ồ', 'ố', 'ộ', 'ỗ'],
             ['ờ', 'ớ', 'ợ'],
             ['ì', 'í', 'ị'],
-            ['ù', 'ú', 'ụ'],
+            ['ủ', 'ù', 'ú', 'ụ'],
             ['ừ', 'ứ', 'ự'],
             ['ỳ', 'ý', 'ỵ']]
+
 
 vocabs_accent = {}
 for ls in lst:
@@ -40,6 +41,7 @@ for ls in lst:
         list_pop = ls[:]
         list_pop.remove(i)
         vocabs_accent[i] = list_pop
+
 
 # thay đổi dấu câu
 def change_accent(txt_src, txt_des, thresh_hold=0.6):
@@ -58,7 +60,7 @@ def change_accent(txt_src, txt_des, thresh_hold=0.6):
 
     prob = random.random()
     # đổi dấu hỏi , ngã
-    if prob < 0.6:
+    if prob < 0.4:
         for k, txt in enumerate(texts):
             if txt.isalpha() and 'oov' not in str(txt):
                 for e, i in enumerate(txt):
@@ -87,28 +89,49 @@ def change_accent(txt_src, txt_des, thresh_hold=0.6):
             if cnt != 0:
                 break
 
-    # đổi à -> á, ạ,  é -> è, ẹ
-    elif 0.6 < prob < 0.8:
-        for k,txt in enumerate(texts):
-            if txt.isalpha() and 'oov' not in str(txt):
-                for i in txt:
-                    if i in list(vocabs_accent.keys()):
-                        texts[k] = texts[k].replace(i, random.choice(vocabs_accent[i]))
-                        cnt += 1
-                        break
 
-                if texts[k] in vocabs_vn_accent:
-                    texts[k] = texts[k]
-                else:
-                    for j, v in enumerate(keys_break_typing):
-                        if v in texts[k]:
-                            texts[k] = texts[k].replace(v, values_break_typing[j])
+    elif 0.4 < prob < 0.8:
+        while True:
+            i = np.random.randint(len(texts))
+            cnt += 1
+            if (texts[i].isalpha() and '<oov>' not in texts[i]):
+                if remove_accent(texts[i]) in vocab_confusion_word_key:
+                    list_word_choice = vocab_confusion_word[remove_accent(texts[i])]
+                    list_word_check_vn = []
+                    for txt in list_word_choice:
+                        if check_syll_vn(norm_text(txt)):
+                            list_word_check_vn.append(norm_text(txt))
 
-                    texts[k] = split_word(texts[k])
-                    ls_txt_des[k] = split_word(ls_txt_des[k])
-
-            if cnt != 0:
+                    print(list_word_check_vn)
+                    texts[i] = random.choice(list_word_check_vn)
                 break
+
+            if cnt == 3:
+                texts = texts
+                break
+
+    # đổi à -> á, ạ,  é -> è, ẹ
+    # elif 0.5 < prob < 0.8:
+    #     for k,txt in enumerate(texts):
+    #         if txt.isalpha() and 'oov' not in str(txt):
+    #             for i in txt:
+    #                 if i in list(vocabs_accent.keys()):
+    #                     texts[k] = texts[k].replace(i, random.choice(vocabs_accent[i]))
+    #                     cnt += 1
+    #                     break
+    #
+    #             if texts[k] in vocabs_vn_accent:
+    #                 texts[k] = texts[k]
+    #             else:
+    #                 for j, v in enumerate(keys_break_typing):
+    #                     if v in texts[k]:
+    #                         texts[k] = texts[k].replace(v, values_break_typing[j])
+    #
+    #                 texts[k] = split_word(texts[k])
+    #                 ls_txt_des[k] = split_word(ls_txt_des[k])
+    #
+    #         if cnt != 0:
+    #             break
 
     # đổi a -> â , e -> ê
     elif 0.8 < prob:
@@ -299,7 +322,7 @@ def random_swap_char_in_word(txt_src, txt_des, index, thresh_hold=1):
     return ' '.join(texts), ' '.join(ls_txt_des)
 
 # thay thế 1 từ bất kì và vỡ telex với xác suất: vui -> với -> vowis || vui -> với
-def random_change_word_and_break(txt_src, txt_des, index, thresh_hold=0.5):
+def random_change_word_and_break(txt_src, txt_des, index, thresh_hold=0.4):
     texts = split_word_with_bound(txt_src)
     ls_txt_des = split_word_with_bound(txt_des)
 
@@ -320,8 +343,29 @@ def random_change_word_and_break(txt_src, txt_des, index, thresh_hold=0.5):
 
     return ' '.join(texts), ' '.join(ls_txt_des)
 
+
+def random_change_word_simmilar_and_break(txt_src, txt_des, index, thresh_hold=1):
+    texts = split_word_with_bound(txt_src)
+    ls_txt_des = split_word_with_bound(txt_des)
+
+    prob = random.random()
+    if prob < thresh_hold:
+        if (texts[index] in vocabs_vn_accent):
+            index_random = vocabs_vn_accent.index(texts[index])
+            if index_random > 5:
+                texts[index] = random.choice(vocabs_vn_accent[index_random-5:index_random+5])
+            else:
+                texts[index] = random.choice(vocabs_vn_accent[index_random:index_random+5])
+
+            texts[index], _ = change_type_telex(texts[index], texts[index], 0)
+
+            if 'oov' in texts[index]:
+                ls_txt_des[index] = split_word(ls_txt_des[index])
+
+    return ' '.join(texts), ' '.join(ls_txt_des)
+
 # bỏ space giữa 2 từ: anh chị -> anhchij || anh chị -> anhchị
-def remove_split_word(txt_src, txt_des, thresh_hold=0.6):
+def remove_split_word(txt_src, txt_des, thresh_hold=0.4):
     texts = split_word_with_bound(txt_src)
     ls_txt_des = split_word_with_bound(txt_des)
 
@@ -330,10 +374,10 @@ def remove_split_word(txt_src, txt_des, thresh_hold=0.6):
         i = np.random.randint(len(texts)-1)
         cnt += 1
         if ('<oov>' not in str(texts[i]) and '<oov>' not in str(texts[i+1]) and check_list_punct(texts[i]) and check_list_punct(texts[i+1]))\
-                or cnt == 2:
+                or cnt == 3:
             break
 
-    if cnt == 2:
+    if cnt == 3:
         texts = texts
         ls_txt_des = ls_txt_des
 
@@ -372,7 +416,7 @@ def remove_split_word(txt_src, txt_des, thresh_hold=0.6):
     return ' '.join(texts), ' '.join(ls_txt_des)
 
 # thêm kí tự vào đầu hoặc cuối từ: nay -> nnay || nay -> nayy
-def add_char_in_word(txt_src, txt_des, index, thresh_hold=0.6):
+def add_char_in_word(txt_src, txt_des, index, thresh_hold=0.5):
     texts = split_word_with_bound(txt_src)
     ls_txt_des = split_word_with_bound(txt_des)
     i = index
@@ -425,7 +469,7 @@ def change_type_telex(txt_src, txt_des, index, thresh_hold=1):
     return ' '.join(texts), ' '.join(ls_txt_des)
 
 # mất kí tự cuối hoặc bất kì: nay -> na
-def convert_typing_missing_char(txt_src, txt_des, index, thresh_hold=0.6):
+def convert_typing_missing_char(txt_src, txt_des, index, thresh_hold=0.7):
     texts = split_word_with_bound(txt_src)
     ls_txt_des = split_word_with_bound(txt_des)
     # i = texts.index(word)
@@ -633,11 +677,11 @@ def augment_data(sent):
                             # trace_code.append("2.2.4")
                             text_src, text_des = convert_random_word_distance_keyboard(text_src, text_des, index)
 
-                        if 0.55 < prob < 0.7:
+                        if 0.55 < prob < 0.65:
                             # trace_code.append("2.2.5")
                             text_src, text_des = convert_last_char_distance_keyboard(text_src, text_des, index)
 
-                        if 0.7 < prob < 0.8:
+                        if 0.65 < prob < 0.8:
                             # trace_code.append("2.2.6")
                             text_src, text_des = random_swap_char_in_word(text_src, text_des, index)
 
@@ -650,7 +694,7 @@ def augment_data(sent):
                             text_src, text_des = add_char_in_word(text_src, text_des, index)
 
             prob = random.random()
-            if prob < 0.1:
+            if prob < 0.4:
                 # trace_code.append("2.3")
                 text_src, text_des = random_add_word(text_src, text_des)
 
@@ -664,7 +708,7 @@ def augment_data(sent):
             text_src, text_des = sents_after_oov, sents_after_oov
 
             prob = random.random()
-            if prob < 0.3:
+            if prob < 0.4:
                 # trace_code.append("3.1")
                 text_src, text_des = remove_split_word(text_src, text_des)
 
@@ -681,19 +725,19 @@ def augment_data(sent):
                             # trace_code.append("3.3.1")
                             text_src, text_des = random_remove_accent(text_src, text_des, index)
 
-                        if 0.1 < prob < 0.2:
+                        if 0.1 < prob < 0.15:
                             # trace_code.append("3.3.2")
                             text_src, text_des = random_change_word_and_break(text_src, text_des, index)
 
-                        if 0.2 < prob < 0.35:
+                        if 0.15 < prob < 0.3:
                             # trace_code.append("3.3.3")
                             text_src, text_des = change_type_telex(text_src, text_des, index)
 
-                        if 0.35 < prob < 0.45:
+                        if 0.3 < prob < 0.4:
                             # trace_code.append("3.3.4")
                             text_src, text_des = convert_typing_missing_char(text_src, text_des, index)
 
-                        if 0.45 < prob < 0.55:
+                        if 0.4 < prob < 0.55:
                             # trace_code.append("3.3.5")
                             text_src, text_des = convert_random_word_distance_keyboard(text_src, text_des, index)
 
@@ -705,16 +749,16 @@ def augment_data(sent):
                             # trace_code.append("3.3.7")
                             text_src, text_des = random_swap_char_in_word(text_src, text_des, index)
 
-                        if 0.75 < prob < 0.9:
+                        if 0.75 < prob < 0.85:
                             # trace_code.append("3.3.8")
                             text_src, text_des = convert_first_char_distance_keyboard(text_src, text_des, index)
 
-                        if 0.9 < prob:
+                        if 0.85 < prob:
                             # trace_code.append("3.3.9")
                             text_src, text_des = add_char_in_word(text_src, text_des, index)
 
             prob = random.random()
-            if prob < 0.3:
+            if prob < 0.4:
                 # trace_code.append("3.4")
                 text_src, text_des = random_del_word(text_src, text_des)
 
@@ -739,15 +783,15 @@ def augment_data(sent):
                             # trace_code.append("4.2.1")
                             text_src, text_des = random_remove_accent(text_src, text_des, index)
 
-                        if 0.1 < prob < 0.2:
+                        if 0.1 < prob < 0.15:
                             # trace_code.append("4.2.2")
                             text_src, text_des = random_change_word_and_break(text_src, text_des, index)
 
-                        if 0.2 < prob < 0.35:
+                        if 0.15 < prob < 0.3:
                             # trace_code.append("4.2.3")
                             text_src, text_des = change_type_telex(text_src, text_des, index)
 
-                        if 0.35 < prob < 0.45:
+                        if 0.3 < prob < 0.45:
                             # trace_code.append("4.2.4")
                             text_src, text_des = convert_typing_missing_char(text_src, text_des, index)
 
@@ -763,11 +807,11 @@ def augment_data(sent):
                             # trace_code.append("4.2.7")
                             text_src, text_des = convert_last_char_distance_keyboard(text_src, text_des, index)
 
-                        if 0.75 < prob < 0.9:
+                        if 0.75 < prob < 0.85:
                             # trace_code.append("4.2.8")
                             text_src, text_des = convert_first_char_distance_keyboard(text_src, text_des, index)
 
-                        if 0.9 < prob:
+                        if 0.85 < prob:
                             # trace_code.append("4.2.9")
                             text_src, text_des = add_char_in_word(text_src, text_des, index)
 
@@ -791,24 +835,25 @@ def augment_data(sent):
             if prob < 0.2:
                 # trace_code.append("5.1")
                 text_src, text_des = remove_split_word(sents_after_oov, sents_after_oov)
+                text_src, text_des = random_remove_accent(text_src, text_des)
                 text_src, text_des = change_accent(text_src, text_des)
 
-            if 0.2 < prob < 0.4:
+            if 0.2 < prob < 0.45:
                 # trace_code.append("5.2")
                 text_src, text_des = change_first_char(sents_after_oov, sents_after_oov)
                 text_src, text_des = random_del_word(text_src, text_des)
 
-            if 0.4 < prob < 0.6:
+            if 0.45 < prob < 0.65:
                 # trace_code.append("5.3")
                 text_src, text_des = change_accent(sents_after_oov, sents_after_oov)
                 text_src, text_des = random_del_word(text_src, text_des)
 
-            if 0.6 < prob < 0.75:
+            if 0.65 < prob < 0.8:
                 # trace_code.append("5.4")
                 text_src, text_des = remove_split_word(sents_after_oov, sents_after_oov)
                 text_src, text_des = change_first_char(text_src, text_des)
 
-            if 0.75 < prob < 0.85:
+            if 0.8 < prob:
                 # trace_code.append("5.5")
                 text_src, text_des = random_add_word(text_src, text_des)
             # if check_oov_by_line(text_src, text_des):
@@ -875,7 +920,9 @@ def augment_data(sent):
                 text_src, text_des = change_first_char(text_src, text_des)
             elif 0.3 < prob < 0.6:
                 # trace_code.append("8")
+                text_src, text_des = random_remove_accent(text_src, text_des)
                 text_src, text_des = change_accent(text_src, text_des)
+
             elif 0.6 < prob:
                 # trace_code.append("9")
                 text_src, text_des = random_del_word(text_src, text_des)
@@ -892,14 +939,61 @@ def augment_data(sent):
     return ls_text
 
 
+def augment_data_extra(sent):
+    ls = []
+
+    # trace_code = []
+    sents_after_oov = check_word_oov(sent, sent)[0]
+
+    prob = random.random()
+    if prob < 0.3:
+        # print('1')
+        ls = augment_data(sent)
+
+    elif 0.3 < prob < 0.45:
+        # print('2')
+        text_src, text_des = sents_after_oov, sents_after_oov
+        index = np.random.randint(len(split_word_with_bound(text_src)))
+        text_src, text_des = random_change_word_and_break(text_src, text_des, index)
+        ls.append('{}||{}'.format(text_src, text_des))
+
+    elif 0.45 < prob < 0.6:
+        # print('3')
+        text_src, text_des = sents_after_oov, sents_after_oov
+        index = np.random.randint(len(split_word_with_bound(text_src)))
+        text_src, text_des = random_change_word_simmilar_and_break(text_src, text_des, index)
+        ls.append('{}||{}'.format(text_src, text_des))
+
+    elif 0.6 < prob < 0.8:
+        # print('4')
+        text_src, text_des = sents_after_oov, sents_after_oov
+        text_src, text_des = random_add_word(text_src, text_des)
+        ls.append('{}||{}'.format(text_src, text_des))
+
+    elif 0.8 < prob:
+        # print('5')
+        text_src, text_des = sents_after_oov, sents_after_oov
+        text_src, text_des = random_del_word(text_src, text_des)
+        ls.append('{}||{}'.format(text_src, text_des))
+
+
+    return ls
+
+
+
+
 if __name__ == '__main__':
     # s = '<oov> hôm </oov> hỏi <oov> gấu <oov> <oov> ham </oov> <oov> miến </oov> <oov> trôi </oov> <oov> đi </oov> <oov> hoobc </oov>'
-    s = "bà trình bày voi toà rằng không hứa hẹn gì với ông t. hết: tôi thấy vợ chồng nó nghèo khổ kêu về cho ở nhờ, tôi còn cho mượn một chỉ vàng và một ngàn đồng bạc để có vốn làm ăn."
+#    s = "bà trình bày với toà rằng không hứa hẹn gì với ông t. hết: tôi thấy vợ chồng nó nghèo khổ kêu về cho ở nhờ, tôi còn cho mượn một chỉ vàng và một ngàn đồng bạc để có vốn làm ăn."
+    s = ' tổng thống thông báo mọi người ở nhà.'
 
     text_src = link_punc(s)
     text_des = text_src
-    # print(augment_data(s))
-    index = 1
+    text_src, text_des = check_word_oov(text_src, text_des)
+    print(change_accent(text_src, text_des))
+    print(remove_split_word(text_src,text_des))
+    # print(augment_data_extra(text_src))
+    # index = 1
 
     # text_src, text_des = random_remove_accent(text_src, text_des, index)
     # print(text_src, text_des)
@@ -907,7 +1001,7 @@ if __name__ == '__main__':
 
     # text_src, text_des = random_change_word_and_break(text_src, text_des, index)
     # print(text_src, text_des)
-
+    # text_src, text_des = random_change_word_simmilar_and_break(text_src, text_des, index)
     # text_src, text_des = change_type_telex(text_src, text_des, index)
     # print(text_src, text_des)
 
@@ -920,11 +1014,11 @@ if __name__ == '__main__':
     # text_src, text_des = random_swap_char_in_word(text_src, text_des, index)
     # print(text_src, text_des)
 
-    text_src, text_des = convert_last_char_distance_keyboard(text_src, text_des, index)
-    print(text_src, text_des)
+    # text_src, text_des = convert_last_char_distance_keyboard(text_src, text_des, index)
+    # print(text_src, text_des)
 
-    text_src, text_des = convert_first_char_distance_keyboard(text_src, text_des, index)
-
-
-    text_src, text_des = add_char_in_word(text_src, text_des, index)
+    # text_src, text_des = convert_first_char_distance_keyboard(text_src, text_des, index)
+    #
+    #
+    # text_src, text_des = add_char_in_word(text_src, text_des, index)
 

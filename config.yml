@@ -1,8 +1,7 @@
 data: ../preprocess/data/new_data_train/new_spell
 save_model: save_model/model
-save_checkpoint_steps: 2
-keep_checkpoint: 2
-train_steps: 10
+save_checkpoint_steps: 5
+train_steps: 100
 valid_steps: 5
 report_every: 5
 
@@ -24,3 +23,5 @@ batch_size: 2
 dropout: 0.0
 
 log_file: save_model/log_file.txt
+
+train_from: /home/taibv/Documents/Projects/spellCorrection/train/save_model/model_step_8.pt

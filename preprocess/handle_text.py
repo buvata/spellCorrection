@@ -212,6 +212,19 @@ def split_word_with_bound(text):
     return ls
 
 
+vocab_confusion_word = {}
+with open("vocab/model_all-vietnamese-words-confusionset.txt") as rf:
+    for line in rf.readlines():
+        line = line.strip()
+        line = norm_text(line)
+        key = line.split(':')[0]
+        values = line.split(':')[1].split('|')
+        vocab_confusion_word[key] = values
+
+vocab_confusion_word_key = list(vocab_confusion_word.keys())
+# vocab_confusion_word_value = list(vocab_confusion_word.values())
+# print(vocab_confusion_word_key)
+
 vocabs_vn_accent = []
 with open("vocab/all-vietnamese-syllables.txt", 'r') as rf:
     for line in rf.readlines():
