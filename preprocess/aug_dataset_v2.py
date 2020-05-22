@@ -55,59 +55,74 @@ def change_accent(txt_src, txt_des, thresh_hold=0.6):
 
     texts = split_word_with_bound(txt_src)
     ls_txt_des = split_word_with_bound(txt_des)
+
     cnt = 0
     # ls = random.sample(texts, len(texts))
 
     prob = random.random()
     # đổi dấu hỏi , ngã
-    if prob < 0.4:
-        for k, txt in enumerate(texts):
-            if txt.isalpha() and 'oov' not in str(txt):
-                for e, i in enumerate(txt):
-                    if i in ls_1:
-                        index = ls_1.index(i)
-                        texts[k] = texts[k].replace(i, ls_2[index])
-                        cnt += 1
-                        break
+    # if prob < 0.4:
+    #     print('1.1')
+    #     for k, txt in enumerate(texts):
+    #         if txt.isalpha() and 'oov' not in str(txt):
+    #             for e, i in enumerate(txt):
+    #                 if i in ls_1:
+    #                     index = ls_1.index(i)
+    #                     texts[k] = texts[k].replace(i, ls_2[index])
+    #                     cnt += 1
+    #                     break
+    #
+    #                 if i in ls_2:
+    #                     index = ls_2.index(i)
+    #                     texts[k] = texts[k].replace(i, ls_1[index])
+    #                     cnt += 1
+    #                     break
+    #
+    #             if texts[k] in vocabs_vn_accent:
+    #                 texts[k] = texts[k]
+    #             else:
+    #                 for j, v in enumerate(keys_break_typing):
+    #                     if v in texts[k]:
+    #                         texts[k] = texts[k].replace(v, values_break_typing[j])
+    #
+    #                 texts[k] = split_word(texts[k])
+    #                 ls_txt_des[k] = split_word(ls_txt_des[k])
+    #
+    #         if cnt != 0:
+    #             break
 
-                    if i in ls_2:
-                        index = ls_2.index(i)
-                        texts[k] = texts[k].replace(i, ls_1[index])
-                        cnt += 1
-                        break
+    list_sent_src = []
+    list_sent_des = []
 
-                if texts[k] in vocabs_vn_accent:
-                    texts[k] = texts[k]
-                else:
-                    for j, v in enumerate(keys_break_typing):
-                        if v in texts[k]:
-                            texts[k] = texts[k].replace(v, values_break_typing[j])
-
-                    texts[k] = split_word(texts[k])
-                    ls_txt_des[k] = split_word(ls_txt_des[k])
-
-            if cnt != 0:
-                break
-
-
-    elif 0.4 < prob < 0.8:
+    if  prob < 1:
+        # print('1.2')
         while True:
             i = np.random.randint(len(texts))
             cnt += 1
+
             if (texts[i].isalpha() and '<oov>' not in texts[i]):
+                a = texts[i]
                 if remove_accent(texts[i]) in vocab_confusion_word_key:
                     list_word_choice = vocab_confusion_word[remove_accent(texts[i])]
-                    list_word_check_vn = []
-                    for txt in list_word_choice:
-                        if check_syll_vn(norm_text(txt)):
-                            list_word_check_vn.append(norm_text(txt))
 
-                    print(list_word_check_vn)
-                    texts[i] = random.choice(list_word_check_vn)
+                    for word_change in list_word_choice:
+                        if not check_syll_vn(word_change):
+                            texts[i] = split_word(word_change)
+                            ls_txt_des[i] = split_word(a)
+
+                        else:
+                            texts[i] = word_change
+                            ls_txt_des[i] = a
+
+                        list_sent_src.append(' '.join(texts))
+                        list_sent_des.append(' '.join(ls_txt_des))
                 break
 
             if cnt == 3:
                 texts = texts
+
+                list_sent_src.append(' '.join(texts))
+                list_sent_des.append(' '.join(ls_txt_des))
                 break
 
     # đổi à -> á, ạ,  é -> è, ẹ
@@ -134,57 +149,58 @@ def change_accent(txt_src, txt_des, thresh_hold=0.6):
     #             break
 
     # đổi a -> â , e -> ê
-    elif 0.8 < prob:
-        for k, txt in enumerate(texts):
-            if txt.isalpha() and 'oov' not in str(txt):
-                for e, i in enumerate(txt):
-                    if i in ls_3:
-                        if e < len(txt) - 1:
-                            if txt[e+1] not in list_vowel:
-                                index = ls_3.index(i)
-                                texts[k] = texts[k].replace(i, ls_4[index])
-                                cnt += 1
-                                break
-                        else:
-                            index = ls_3.index(i)
-                            texts[k] = texts[k].replace(i, ls_4[index])
-                            cnt += 1
-                            break
+    # elif 0.8 < prob:
+    #     print('1.3')
+    #     for k, txt in enumerate(texts):
+    #         if txt.isalpha() and 'oov' not in str(txt):
+    #             for e, i in enumerate(txt):
+    #                 if i in ls_3:
+    #                     if e < len(txt) - 1:
+    #                         if txt[e+1] not in list_vowel:
+    #                             index = ls_3.index(i)
+    #                             texts[k] = texts[k].replace(i, ls_4[index])
+    #                             cnt += 1
+    #                             break
+    #                     else:
+    #                         index = ls_3.index(i)
+    #                         texts[k] = texts[k].replace(i, ls_4[index])
+    #                         cnt += 1
+    #                         break
+    #
+    #                 if i in ls_4:
+    #                     if e < len(txt) - 1:
+    #                         if txt[e+1] not in list_vowel:
+    #                             index = ls_4.index(i)
+    #                             texts[k] = texts[k].replace(i, ls_3[index])
+    #                             cnt += 1
+    #                             break
+    #                     else:
+    #                         index = ls_4.index(i)
+    #                         texts[k] = texts[k].replace(i, ls_3[index])
+    #                         cnt += 1
+    #                         break
+    #
+    #             if check_syll_vn(texts[k]):
+    #                 texts[k] = texts[k]
+    #             else:
+    #                 prob = random.random()
+    #                 if prob < 0.6:
+    #                     for j, v in enumerate(keys_break_typing):
+    #                         if v in texts[k]:
+    #                             texts[k] = texts[k].replace(v, values_break_typing[j])
+    #
+    #                     texts[k] = split_word(texts[k])
+    #                     ls_txt_des[k] = split_word(ls_txt_des[k])
+    #
+    #                 else:
+    #                     texts[k] = split_word(texts[k])
+    #                     ls_txt_des[k] = split_word(ls_txt_des[k])
+    #
+    #         if cnt != 0:
+    #             break
 
-                    if i in ls_4:
-                        if e < len(txt) - 1:
-                            if txt[e+1] not in list_vowel:
-                                index = ls_4.index(i)
-                                texts[k] = texts[k].replace(i, ls_3[index])
-                                cnt += 1
-                                break
-                        else:
-                            index = ls_4.index(i)
-                            texts[k] = texts[k].replace(i, ls_3[index])
-                            cnt += 1
-                            break
 
-                if check_syll_vn(texts[k]):
-                    texts[k] = texts[k]
-                else:
-                    prob = random.random()
-                    if prob < 0.6:
-                        for j, v in enumerate(keys_break_typing):
-                            if v in texts[k]:
-                                texts[k] = texts[k].replace(v, values_break_typing[j])
-
-                        texts[k] = split_word(texts[k])
-                        ls_txt_des[k] = split_word(ls_txt_des[k])
-
-                    else:
-                        texts[k] = split_word(texts[k])
-                        ls_txt_des[k] = split_word(ls_txt_des[k])
-
-            if cnt != 0:
-                break
-
-
-    return ' '.join(texts), ' '.join(ls_txt_des)
+    return list_sent_src, list_sent_des
 
 # xóa 1 từ bất kì nằm trong vocab
 def random_del_word(txt_src, txt_des, thresh_hold=1):
@@ -475,7 +491,7 @@ def convert_typing_missing_char(txt_src, txt_des, index, thresh_hold=0.7):
     # i = texts.index(word)
     i = index
 
-    if check_syll_vn(texts[i]):
+    if check_syll_vn(texts[i]) and len(texts[i]) > 1:
         prob = random.random()
         if prob < thresh_hold:
             texts[i] = texts[i][:-1]
@@ -546,7 +562,7 @@ def convert_last_char_distance_keyboard(txt_src, txt_des, index, thresh_hold=1):
 
     prob = random.random()
     if prob < thresh_hold:
-        if check_syll_vn(texts[i]) and texts[i][-1] in ls_keys_last:
+        if check_syll_vn(texts[i]) and len(texts[i]) > 1 and texts[i][-1] in ls_keys_last:
             texts[i] = texts[i][:-1] + data_keys_last[texts[i][-1]][0]
             if not check_syll_vn(texts[i]):
                 prob = random.random()
@@ -570,7 +586,7 @@ def convert_first_char_distance_keyboard(txt_src, txt_des, index, thresh_hold=1)
     # i = texts.index(word)
     i = index
 
-    if check_syll_vn(texts[i]):
+    if check_syll_vn(texts[i]) and len(texts[i]) > 1:
         prob = random.random()
         if prob < thresh_hold:
             if texts[i][0] in ls_key_random:
@@ -644,7 +660,7 @@ def augment_data(sent):
     prob = random.random()
     if prob < 0.4:
         # trace_code.append("2")
-        text_src, text_des = remove_accent_sent(sents_after_oov), sents_after_oov
+        text_src, text_des = remove_accent(sents_after_oov), sents_after_oov
         ls.append('{}||{}'.format(text_src, text_des))
 
 
@@ -694,12 +710,13 @@ def augment_data(sent):
                             text_src, text_des = add_char_in_word(text_src, text_des, index)
 
             prob = random.random()
-            if prob < 0.4:
+            if prob < 0.5:
                 # trace_code.append("2.3")
                 text_src, text_des = random_add_word(text_src, text_des)
 
             # if check_oov_by_line(text_src, text_des):
             #     print(# trace_code)
+            # text_src = remove_accent(text_src)
             ls.append('{}||{}'.format(text_src, text_des))
 
 
@@ -758,12 +775,13 @@ def augment_data(sent):
                             text_src, text_des = add_char_in_word(text_src, text_des, index)
 
             prob = random.random()
-            if prob < 0.4:
+            if prob < 0.5:
                 # trace_code.append("3.4")
                 text_src, text_des = random_del_word(text_src, text_des)
 
             # if check_oov_by_line(text_src, text_des):
             #     print(# trace_code)
+            # text_src = remove_accent(text_src)
             ls.append('{}||{}'.format(text_src, text_des))
 
         elif 0.35 < prob < 0.5:
@@ -816,15 +834,22 @@ def augment_data(sent):
                             text_src, text_des = add_char_in_word(text_src, text_des, index)
 
             prob = random.random()
-            if prob < 0.3:
-                # trace_code.append("4.3")
-                text_src, text_des = change_accent(text_src, text_des)
-            if 0.3 < prob < 0.6:
+            if prob < 0.5:
+            #     # trace_code.append("4.3")
+                list_text_src, list_text_des = change_accent(text_src, text_des)
+                for i, text_src in enumerate(list_text_src):
+                    ls.append('{}||{}'.format(text_src, list_text_des[i]))
+
+            if 0.5 < prob < 0.8:
                 # trace_code.append("4.4")
                 text_src, text_des = change_first_char(text_src, text_des)
             # if check_oov_by_line(text_src, text_des):
             #     print(# trace_code)
-            ls.append('{}||{}'.format(text_src, text_des))
+            # text_src = remove_accent(text_src)
+                ls.append('{}||{}'.format(text_src, text_des))
+
+            if 0.8 < prob:
+                ls.append('{}||{}'.format(text_src, text_des))
 
 
         elif 0.5 < prob < 0.6:
@@ -835,30 +860,37 @@ def augment_data(sent):
             if prob < 0.2:
                 # trace_code.append("5.1")
                 text_src, text_des = remove_split_word(sents_after_oov, sents_after_oov)
-                text_src, text_des = random_remove_accent(text_src, text_des)
-                text_src, text_des = change_accent(text_src, text_des)
+                list_text_src, list_text_des = change_accent(text_src, text_des)
+                for i, text_src in enumerate(list_text_src):
+                    ls.append('{}||{}'.format(text_src, list_text_des[i]))
+                # text_src, text_des = random_remove_accent(text_src, text_des)
+
 
             if 0.2 < prob < 0.45:
                 # trace_code.append("5.2")
                 text_src, text_des = change_first_char(sents_after_oov, sents_after_oov)
                 text_src, text_des = random_del_word(text_src, text_des)
+                ls.append('{}||{}'.format(text_src, text_des))
 
             if 0.45 < prob < 0.65:
                 # trace_code.append("5.3")
-                text_src, text_des = change_accent(sents_after_oov, sents_after_oov)
+                # text_src, text_des = change_accent(sents_after_oov, sents_after_oov)
                 text_src, text_des = random_del_word(text_src, text_des)
+                ls.append('{}||{}'.format(text_src, text_des))
 
             if 0.65 < prob < 0.8:
                 # trace_code.append("5.4")
                 text_src, text_des = remove_split_word(sents_after_oov, sents_after_oov)
                 text_src, text_des = change_first_char(text_src, text_des)
+                ls.append('{}||{}'.format(text_src, text_des))
 
             if 0.8 < prob:
                 # trace_code.append("5.5")
                 text_src, text_des = random_add_word(text_src, text_des)
             # if check_oov_by_line(text_src, text_des):
             #     print(# trace_code)
-            ls.append('{}||{}'.format(text_src, text_des))
+            # text_src = remove_accent(text_src)
+                ls.append('{}||{}'.format(text_src, text_des))
 
 
         elif 0.6 < prob < 0.7:
@@ -918,17 +950,21 @@ def augment_data(sent):
             if prob < 0.3:
                 # trace_code.append("7")
                 text_src, text_des = change_first_char(text_src, text_des)
+                ls.append('{}||{}'.format(text_src, text_des))
+
             elif 0.3 < prob < 0.6:
-                # trace_code.append("8")
-                text_src, text_des = random_remove_accent(text_src, text_des)
-                text_src, text_des = change_accent(text_src, text_des)
+               # trace_code.append("8")
+               list_text_src, list_text_des = change_accent(text_src, text_des)
+               for i, text_src in enumerate(list_text_src):
+                   ls.append('{}||{}'.format(text_src, list_text_des[i]))
 
             elif 0.6 < prob:
                 # trace_code.append("9")
                 text_src, text_des = random_del_word(text_src, text_des)
             # if check_oov_by_line(text_src, text_des):
             #     print(# trace_code)
-            ls.append('{}||{}'.format(text_src, text_des))
+            # text_src = remove_accent(text_src)
+                ls.append('{}||{}'.format(text_src, text_des))
 
     # if check_oov_by_line(text_src, text_des):
     #     print(# trace_code)
@@ -946,11 +982,11 @@ def augment_data_extra(sent):
     sents_after_oov = check_word_oov(sent, sent)[0]
 
     prob = random.random()
-    if prob < 0.3:
+    if prob < 0.2:
         # print('1')
         ls = augment_data(sent)
 
-    elif 0.3 < prob < 0.45:
+    elif 0.2 < prob < 0.35:
         # print('2')
         text_src, text_des = sents_after_oov, sents_after_oov
         index = np.random.randint(len(split_word_with_bound(text_src)))
@@ -985,13 +1021,13 @@ def augment_data_extra(sent):
 if __name__ == '__main__':
     # s = '<oov> hôm </oov> hỏi <oov> gấu <oov> <oov> ham </oov> <oov> miến </oov> <oov> trôi </oov> <oov> đi </oov> <oov> hoobc </oov>'
 #    s = "bà trình bày với toà rằng không hứa hẹn gì với ông t. hết: tôi thấy vợ chồng nó nghèo khổ kêu về cho ở nhờ, tôi còn cho mượn một chỉ vàng và một ngàn đồng bạc để có vốn làm ăn."
-    s = ' tổng thống thông báo mọi người ở nhà.'
+    s = ' vào thời đó, người đẹp bị nghi đã sửa mũi và nâng cung mắt.'
 
     text_src = link_punc(s)
     text_des = text_src
     text_src, text_des = check_word_oov(text_src, text_des)
     print(change_accent(text_src, text_des))
-    print(remove_split_word(text_src,text_des))
+    # print(remove_split_word(text_src,text_des))
     # print(augment_data_extra(text_src))
     # index = 1
 

@@ -80,7 +80,7 @@ def run_multi_thread(file_data, file_src, file_des):
 
 
 if __name__ == '__main__':
-   file_data = 'data/train_data/test.txt'
+   file_data = 'data/train_data/demo-full.txt'
    file_src = 'data/train_data/sent_src.txt'
    file_des = 'data/train_data/sent_des.txt'
    run_multi_thread(file_data,file_src, file_des)

@@ -87,46 +87,70 @@ def handle_punctuation(text):
     return text
 
 
+# def link_punc(line):
+#     line = line.replace('_', '#')
+#     line = line.replace('\n', '')
+#     line = line.strip()
+#     l_txt = line.split(' ')
+#     current = ''
+#     for k, txt in enumerate(l_txt):
+#         new_word = ''
+#         if k == 0 and txt in set_punctuations:
+#             current += txt
+#
+#         else:
+#             for i, t in enumerate(list(txt)):
+#                 l_t = []
+#                 if t in set_punctuations and i == len(list(txt))-1:
+#                     t = ' _' + t
+#                 elif t in set_punctuations and 0 < i < len(list(txt))-1:
+#                     t = ' _' + t + ' '
+#                 elif t in set_punctuations and i == 0:
+#                     (list(txt))[i+1] = ' _' + (list(txt))[i+1]
+#                 elif 0 < i < len(list(txt))-1 and list(txt)[i-1] in set_punctuations:
+#                     t = ' _' + t
+#                 else:
+#                     t = t
+#                 l_t.append(t)
+#                 new_word += ''.join(l_t)
+#
+#         current += ' ' + new_word
+#
+#     current = remove_multi_space(current)
+#
+#     current = current.split(' ')
+#     ls_txt = []
+#     for txt in current:
+#         if txt.replace('_', '').isalpha():
+#             txt = txt.replace("_", '')
+#         ls_txt.append(txt)
+#
+#     return ' '.join(ls_txt)
+
+
 def link_punc(line):
     line = line.replace('_', '#')
     line = line.replace('\n', '')
     line = line.strip()
-    l_txt = line.split(' ')
     current = ''
-    for k, txt in enumerate(l_txt):
-        new_word = ''
-        if k == 0 and txt in set_punctuations:
-            current += txt
-        else:
-            for i, t in enumerate(list(txt)):
-                l_t = []
-                if t in set_punctuations and i == len(list(txt))-1:
-                    t = ' _' + t
-                elif t in set_punctuations and 0 < i < len(list(txt))-1:
-                    t = ' _' + t + ' '
-                    (list(txt))[i+1] = ' _' + (list(txt))[i+1]
-                    # print('a')
-                elif t in set_punctuations and i == 0:
-                    (list(txt))[i+1] = ' _' + (list(txt))[i+1]
-                elif 0 < i < len(list(txt))-1 and list(txt)[i-1] in set_punctuations:
-                    t = ' _' + t
-                else:
-                    t = t
-                l_t.append(t)
-                new_word += ''.join(l_t)
+    for i, txt in enumerate(line):
+        if txt in set_punctuations:
+            if 0 < i and line[i-1] != ' ':
+                current += ' _' + txt
+            else:
+                current += txt
 
-        current += ' ' + new_word
+        elif txt not in set_punctuations and txt != ' ':
+            if 0 < i and line[i-1] in set_punctuations:
+                current += ' ' + txt
+            else:
+                current += txt
+        else:
+            current += txt
 
     current = remove_multi_space(current)
 
-    current = current.split(' ')
-    ls_txt = []
-    for txt in current:
-        if txt.replace('_', '').isalpha():
-            txt = txt.replace("_", '')
-        ls_txt.append(txt)
-
-    return ' '.join(ls_txt)
+    return current
 
 
 def split_word(text):
@@ -329,9 +353,19 @@ def format_output(text):
     texts = list(text)
 
     ls_txt = []
+
     for i, txt in enumerate(texts):
 
         if txt == ' ' and '_' in texts[i + 1]:
+            txt = txt.replace(' ', '')
+
+        if txt == ' ' and (texts[i-1] == '(' or texts[i-1] == '/'):
+            txt = txt.replace(' ', '')
+
+        if txt == ' ' and (texts[i-1] == '"' and texts[i-2] != '_'):
+            txt = txt.replace(' ', '')
+
+        if txt == ' ' and (texts[i-1] == '-' and texts[i-2] == '_'):
             txt = txt.replace(' ', '')
 
         txt = txt.replace('_', '')
@@ -359,6 +393,9 @@ def format_input(text):
 
 
 if __name__ == '__main__':
-    s = 'hôm nay toif di rất vui, gặp 37 bạn mới nhiễm covid-19 cách ly.'
-    print(format_input(s))
-
+    s = 'từ năm 2 _0 _1 _7 đến nay _, <oov> p _c _6 _7 </oov> trích xuất 4 _9 _. 7 _0 _4 trường hợp vi phạm nhưng mới ba t.s chỉ xử phạt được 1 _6 _. 1 _0 _6 trường hợp ( đạt tỷ lệ 3 _2 _, 4 _% _) _.'
+    # s = '3-4'
+    # print(link_punc(s))
+    # e = format_input(s)
+    # print(e)
+    print(format_output(s))
